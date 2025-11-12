@@ -1,21 +1,363 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Simple Form</title>
-    <script>
-        function submitForm() {
-            const name = document.getElementById("query").value;
-            window.location.href = `https://dev-api-bzms.zatca.gov.sa/clusterendpoint-test`;
-            return false;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZATCA API Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    </script>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            flex: 1;
+        }
+
+        .btn-submit:hover {
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+
+        .response-area {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            min-height: 100px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .response-area h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .response-content {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #333;
+        }
+
+        .loading {
+            color: #667eea;
+            font-style: italic;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #ffeaea;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .success {
+            color: #27ae60;
+            background: #eafaf1;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .input-group .form-group {
+            margin-bottom: 0;
+        }
+
+        .btn-small {
+            padding: 12px 20px;
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
-    <h2>Submit a Name</h2>
-    <form onsubmit="return submitForm();">
-        <label for="query">Enter name:</label>
-        <input type="text" id="query" name="query" required />
-        <button type="submit">Submit</button>
-    </form>
+<div class="container">
+    <div class="header">
+        <h1>🚀 ZATCA API Client</h1>
+        <p>Adapter Microservice API Interface</p>
+    </div>
+
+    <!-- GET Requests Section -->
+    <div class="card">
+        <h2>GET Requests</h2>
+        <div class="button-group">
+            <button class="btn" onclick="callAPI('GET', 'http://172.19.128.138:8080/hello')">
+                Hello
+            </button>
+            <button class="btn" onclick="callAPI('GET', 'http://172.19.128.138:8080/getHSDetails')">
+                Get HS Details
+            </button>
+            <button class="btn" onclick="callAPI('GET', 'http://172.19.128.138:8080/getImporterDetails')">
+                Get Importer Details
+            </button>
+        </div>
+    </div>
+
+    <!-- Get Products by HS Code Section -->
+    <div class="card">
+        <h2>Get Products by HS Code</h2>
+        <div class="input-group">
+            <div class="form-group">
+                <label for="hsCode">HS Code:</label>
+                <input type="text" id="hsCode" placeholder="Enter HS Code (e.g., 5543)" value="5543">
+            </div>
+            <button class="btn btn-small" onclick="getProductsByHsCode()">
+                Get Products
+            </button>
+        </div>
+    </div>
+
+    <!-- Create Product Section -->
+    <div class="card">
+        <h2>Create Product</h2>
+        <form id="createProductForm" onsubmit="createProduct(event)">
+            <div class="form-group">
+                <label for="hscode">HS Code:</label>
+                <input type="text" id="hscode" name="hscode" placeholder="Enter HS Code (e.g., 7777)" required>
+            </div>
+            <div class="form-group">
+                <label for="name">Product Name:</label>
+                <input type="text" id="name" name="name" placeholder="Enter Product Name (e.g., Iphone 77)" required>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-submit">Create Product</button>
+                <button type="reset" class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">Clear</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Response Area -->
+    <div class="card">
+        <div class="response-area">
+            <h3>API Response</h3>
+            <div id="responseContent" class="response-content">
+                Click any button above to see the API response here...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://172.19.128.138:8080';
+
+    function updateResponse(content, isError = false, isSuccess = false) {
+        const responseContent = document.getElementById('responseContent');
+        const className = isError ? 'error' : (isSuccess ? 'success' : '');
+
+        if (className) {
+            responseContent.className = `response-content ${className}`;
+        } else {
+            responseContent.className = 'response-content';
+        }
+
+        responseContent.textContent = content;
+    }
+
+    async function callAPI(method, url) {
+        const responseContent = document.getElementById('responseContent');
+        responseContent.textContent = 'Loading...';
+        responseContent.className = 'response-content loading';
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            const formattedResponse = JSON.stringify(data, null, 2);
+
+            if (response.ok) {
+                updateResponse(`Status: ${response.status} ${response.statusText}\n\n${formattedResponse}`, false, true);
+            } else {
+                updateResponse(`Error ${response.status}: ${response.statusText}\n\n${formattedResponse}`, true);
+            }
+        } catch (error) {
+            updateResponse(`Error: ${error.message}\n\nPlease check if the API server is running and accessible.`, true);
+        }
+    }
+
+    async function getProductsByHsCode() {
+        const hsCode = document.getElementById('hsCode').value.trim();
+
+        if (!hsCode) {
+            updateResponse('Please enter an HS Code', true);
+            return;
+        }
+
+        const url = `${API_BASE_URL}/getProductsByHsCode/${hsCode}`;
+        await callAPI('GET', url);
+    }
+
+    async function createProduct(event) {
+        event.preventDefault();
+
+        const hscode = document.getElementById('hscode').value.trim();
+        const name = document.getElementById('name').value.trim();
+
+        if (!hscode || !name) {
+            updateResponse('Please fill in all fields', true);
+            return;
+        }
+
+        const responseContent = document.getElementById('responseContent');
+        responseContent.textContent = 'Creating product...';
+        responseContent.className = 'response-content loading';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/create-product`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    hscode: hscode,
+                    name: name
+                })
+            });
+
+            const data = await response.json();
+            const formattedResponse = JSON.stringify(data, null, 2);
+
+            if (response.ok) {
+                updateResponse(`Status: ${response.status} ${response.statusText}\n\nProduct Created Successfully!\n\n${formattedResponse}`, false, true);
+                // Clear the form
+                document.getElementById('createProductForm').reset();
+            } else {
+                updateResponse(`Error ${response.status}: ${response.statusText}\n\n${formattedResponse}`, true);
+            }
+        } catch (error) {
+            updateResponse(`Error: ${error.message}\n\nPlease check if the API server is running and accessible.`, true);
+        }
+    }
+</script>
 </body>
 </html>
