@@ -207,13 +207,13 @@
     <div class="card">
         <h2>GET Requests</h2>
         <div class="button-group">
-            <button class="btn" onclick="callAPI('GET', 'http://172.19.128.138:8080/hello')">
+            <button class="btn" onclick="callAPI('GET', 'https://dev-api-bzms.zatca.gov.sa/clusterendpoint-test')">
                 Hello
             </button>
-            <button class="btn" onclick="callAPI('GET', 'http://172.19.128.138:8080/getHSDetails')">
+            <button class="btn" onclick="callAPI('GET', 'https://dev-api-bzms.zatca.gov.sa/getHSDetails')">
                 Get HS Details
             </button>
-            <button class="btn" onclick="callAPI('GET', 'http://172.19.128.138:8080/getImporterDetails')">
+            <button class="btn" onclick="callAPI('GET', 'https://dev-api-bzms.zatca.gov.sa/getImporterDetails')">
                 Get Importer Details
             </button>
         </div>
@@ -264,7 +264,7 @@
 </div>
 
 <script>
-    const API_BASE_URL = 'http://172.19.128.138:8080';
+    const API_BASE_URL = 'https://dev-api-bzms.zatca.gov.sa';
 
     function updateResponse(content, isError = false, isSuccess = false) {
         const responseContent = document.getElementById('responseContent');
@@ -313,7 +313,7 @@
             return;
         }
 
-        const url = `${API_BASE_URL}/getProductsByHsCode/${hsCode}`;
+        const url = `${API_BASE_URL}/adapterGetProductsByHsCode/${hsCode}`;
         await callAPI('GET', url);
     }
 
@@ -333,7 +333,7 @@
         responseContent.className = 'response-content loading';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/create-product`, {
+            const response = await fetch(`${API_BASE_URL}/createProductAdapterService`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
